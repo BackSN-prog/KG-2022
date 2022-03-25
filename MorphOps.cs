@@ -2,7 +2,7 @@
 {
 	internal class MorphOps : MatrixFilter
 	{
-		public static float[,] mask = null;
+		public static float[,] mask = { {1,1,1 },{1,1,1 },{1,1,1 } };
 		public MorphOps()
 		{
 			setNewKernel(mask.GetLength(0), mask.GetLength(1));
@@ -11,12 +11,8 @@
 		{
 			kernel = new float[l, h];
 			for (int i = 0; i < l; ++i)
-			{
 				for (int j = 0; j < h; ++j)
-				{
 					kernel[i, j] = mask[i, j];
-				}
-			}
 		}
 		public static void setMask(int x, int y, int val)
 		{

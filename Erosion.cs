@@ -1,5 +1,4 @@
 ﻿using Lab1_kg_;
-using System;
 using System.Drawing;
 
 namespace WindowsFormsApp1

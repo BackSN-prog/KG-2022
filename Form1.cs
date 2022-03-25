@@ -55,66 +55,60 @@ namespace Lab1_kg_
 
         private void openingToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //Filter filter = new Opening();
-            //backgroundWorker1.RunWorkerAsync(filter);
+            Filter filter = new Opening();
+            backgroundWorker1.RunWorkerAsync(filter);
         }
 
         private void closingToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //Filter filter = new Closing();
-            //backgroundWorker1.RunWorkerAsync(filter);
+            Filter filter = new Closing();
+            backgroundWorker1.RunWorkerAsync(filter);
         }
 
         private void gradToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //Filter filter = new Grad();
-            //backgroundWorker1.RunWorkerAsync(filter);
+            Filter filter = new Grad();
+            backgroundWorker1.RunWorkerAsync(filter);
         }
 
         private void dilationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //Filter filter = new Dilation();
-            //backgroundWorker1.RunWorkerAsync(filter);
+            Filter filter = new Dilation();
+            backgroundWorker1.RunWorkerAsync(filter);
         }
 
         private void erosionToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //Filter filter = new Erosion();
-            //backgroundWorker1.RunWorkerAsync(filter);
+            Filter filter = new Erosion();
+            backgroundWorker1.RunWorkerAsync(filter);
         }
 
         private void binarToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // if it is to open file successful.
+
             if (image != null)
             {
-                // Establish a color object.
+
                 Color curColor;
                 int ret;
-                // The width of the image.
+
                 for (int iX = 0; iX < image.Width; iX++)
                 {
-                    // The height of the image.
+
                     for (int iY = 0; iY < image.Height; iY++)
                     {
-                        // Get the pixel from bitmap object.
                         curColor = image.GetPixel(iX, iY);
-                        // Transform RGB to Y (gray scale)
+
                         ret = (int)(curColor.R * 0.299 + curColor.G * 0.578 + curColor.B * 0.114);
-                        // This is our threshold, you can change it and to try what are different.
+
                         if (ret > 120)
-                        {
                             ret = 255;
-                        }
                         else
-                        {
                             ret = 0;
-                        }
-                        // Set the pixel into the bitmap object.
+
                         image.SetPixel(iX, iY, Color.FromArgb(ret, ret, ret));
-                    } // The closing 'The height of the image'.
-                } // The closing 'The width of the image'.
-                // Force to redraw.
+                    }
+                }
                 Invalidate();
                 pictureBox1.Image = image;
             }
@@ -271,32 +265,31 @@ namespace Lab1_kg_
             {
                 for (int x = 0; x < image.Width * 3; x += 3)
                 {
-                    r_x = g_x = b_x = 0; //reset the gradients in x-direcion values
-                    r_y = g_y = b_y = 0; //reset the gradients in y-direction values
+                    r_x = g_x = b_x = 0;
+                    r_y = g_y = b_y = 0;
                     location = x + y * ImageData.Stride;
                     for (int yy = -(int)Math.Floor(weights_y.GetLength(0) / 2.0d), yyy = 0; yy <= (int)Math.Floor(weights_y.GetLength(0) / 2.0d); yy++, yyy++)
                     {
-                        if (y + yy >= 0 && y + yy < image.Height) //to prevent crossing the bounds of the array
+                        if (y + yy >= 0 && y + yy < image.Height)
                         {
                             for (int xx = -(int)Math.Floor(weights_x.GetLength(1) / 2.0d) * 3, xxx = 0; xx <= (int)Math.Floor(weights_x.GetLength(1) / 2.0d) * 3; xx += 3, xxx++)
                             {
-                                if (x + xx >= 0 && x + xx <= image.Width * 3 - 3) //to prevent crossing the bounds of the array
+                                if (x + xx >= 0 && x + xx <= image.Width * 3 - 3)
                                 {
                                     location2 = x + xx + (yy + y) * ImageData.Stride;
                                     weight_x = weights_x[yyy, xxx];
                                     weight_y = weights_y[yyy, xxx];
-                                    //applying the same weight to all channels
+
                                     b_x += buffer[location2] * weight_x;
-                                    g_x += buffer[location2 + 1] * weight_x; //G_X
+                                    g_x += buffer[location2 + 1] * weight_x;
                                     r_x += buffer[location2 + 2] * weight_x;
                                     b_y += buffer[location2] * weight_y;
-                                    g_y += buffer[location2 + 1] * weight_y;//G_Y
+                                    g_y += buffer[location2 + 1] * weight_y;
                                     r_y += buffer[location2 + 2] * weight_y;
                                 }
                             }
                         }
                     }
-                    //getting the magnitude for each channel
                     b = (int)Math.Sqrt(Math.Pow(b_x, 2) + Math.Pow(b_y, 2));
                     g = (int)Math.Sqrt(Math.Pow(g_x, 2) + Math.Pow(g_y, 2));
                     r = (int)Math.Sqrt(Math.Pow(r_x, 2) + Math.Pow(r_y, 2));
