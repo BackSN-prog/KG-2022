@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -114,7 +114,31 @@ namespace Lab1_kg_
             }
         }
 
+
         private IntPtr pointer, pointer2;
+
+        private void grayScaleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Bitmap bt = new Bitmap(pictureBox1.Image);
+            {
+                for (int y = 0; y < image.Height; y++)
+                    for (int x = 0; x < image.Width; x++)
+                    {
+                        Color c = bt.GetPixel(x, y);
+
+                        // int a = c.A;
+                        int r = c.R;
+                        int g = c.G;
+                        int b = c.B;
+
+                        int avg = (r + g + b) / 3;
+                        bt.SetPixel(x, y, Color.FromArgb(avg, avg, avg));
+                    }
+                pictureBox1.Image = bt;
+
+
+            }
+        }
 
         public Form1()
         {
@@ -248,6 +272,31 @@ namespace Lab1_kg_
                 Marshal.Copy(buffer, 0, pointer, buffer.Length);
                 buffer_image.UnlockBits(ImageData);
                 pictureBox1.Image = (Bitmap)buffer_image.Clone();
+            }
+        }
+
+
+        private void grayScaleToolStripMenuItem_Click(Bitmap sourceImage, object sender, EventArgs e)
+        {
+           
+            Bitmap bt = new Bitmap(pictureBox1.Image);
+            {
+                for (int y = 0; y < image.Height; y++)
+                    for (int x = 0; x < image.Width; x++)
+                    {
+                        Color c = bt.GetPixel(x, y);
+                      
+                        // int a = c.A;
+                        int r = c.R;
+                        int g = c.G;
+                        int b = c.B;
+
+                        int avg = (r + g + b) / 3;
+                        bt.SetPixel(x, y, Color.FromArgb(avg, avg, avg));
+                    }
+                pictureBox1.Image = bt;
+
+               
             }
         }
 
