@@ -11,7 +11,7 @@ namespace Lab1_kg_
 {
     public partial class Form1 : Form
     {
-        private Bitmap image, image2;
+        private Bitmap image, image2, image3;
         private BitmapData ImageData, ImageData2;
         private byte[] buffer, buffer2;
         private double gammacorrection;
@@ -114,35 +114,129 @@ namespace Lab1_kg_
             }
         }
 
+        private void inversionToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void arifmtecsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+             Bitmap bmp = new Bitmap(pictureBox1.Image);
+             int r = 0;
+             int g = 0;
+             int b = 0;
+
+             int total = 0;
+
+             for (int x = 0; x < bmp.Width; x++)
+             {
+                  for (int y = 0; y < bmp.Height; y++)
+                  {
+                        Color c = bmp.GetPixel(x, y);
+
+                        r += c.R;
+                        g += c.G;
+                        b += c.B;
+
+                        total++;
+
+                        r /= total;
+                        g /= total;
+                        b /= total;
+                        int avg = (r + g + b) / 3;
+
+                    bmp.SetPixel(255, y, Color.FromArgb(r, g, b));
+                    
+                }
+                //pictureBox1.Image = bmp;
+                bmp.SetPixel(x, 255, Color.FromArgb(r, g, b));
+                
+            }
+            pictureBox1.Image = bmp;
+        }
+
+        private void grayToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+           
+
+                Bitmap bt = new Bitmap(pictureBox1.Image);
+                {
+                    for (int y = 0; y < image.Height; y++)
+                        for (int x = 0; x < image.Width; x++)
+                        {
+                            Color c = bt.GetPixel(x, y);
+
+                            // int a = c.A;
+                            int r = c.R;
+                            int g = c.G;
+                            int b = c.B;
+
+                            int avg = (r + g + b) / 3;
+                            bt.SetPixel(x, y, Color.FromArgb(avg, avg, avg));
+                        }
+                    pictureBox1.Image = bt;
+
+
+                }
+            }
+
+        private void arifmeticToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filter filter = new BlurFilter();
+            backgroundWorker1.RunWorkerAsync(filter);
+        }
+
+        private void autoToolStripMenuItem_Click(object sender, EventArgs e)   
+        {
+                double rmax = image.GetPixel(0, 0).R;
+                double gmax = image.GetPixel(0, 0).G;
+                double bmax = image.GetPixel(0, 0).B;
+
+                double rmin = image.GetPixel(0, 0).R;
+                double gmin = image.GetPixel(0, 0).G;
+                double bmin = image.GetPixel(0, 0).B;
+
+                image3 = new Bitmap(image.Width, image.Height);
+
+                for (int i = 0; i < image.Width; i++)
+                    for (int j = 0; j < image.Height; j++)
+                    {
+                        Color tmp = image.GetPixel(i, j);
+                        if (tmp.R > rmax)
+                            rmax = tmp.R;
+                        if (tmp.G > gmax)
+                            gmax = tmp.G;
+                        if (tmp.B > bmax)
+                            bmax = tmp.B;
+
+                        if (tmp.R < rmin)
+                            rmin = tmp.R;
+                        if (tmp.G < gmin)
+                            gmin = tmp.G;
+                        if (tmp.B < bmin)
+                            bmin = tmp.B;
+                    }
+
+                for (int i = 0; i < image.Width; i++)
+                    for (int j = 0; j < image.Height; j++)
+                    {
+                        Color tmp = image.GetPixel(i, j);
+                        image3.SetPixel(i, j, Color.FromArgb((int)((tmp.R - rmin) / (rmax - rmin) * 255.0),
+                                                         (int)((tmp.G - gmin) / (gmax - gmin) * 255.0),     
+                                                         (int)((tmp.B - bmin) / (bmax - bmin) * 255.0)));                               
+                    } //New_val= (val-min_val) / (max_val-min_val) *255
+                pictureBox1.Image = image3;
+                pictureBox1.Refresh();
+
+        }
 
         private IntPtr pointer, pointer2;
-
-        private void grayScaleToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Bitmap bt = new Bitmap(pictureBox1.Image);
-            {
-                for (int y = 0; y < image.Height; y++)
-                    for (int x = 0; x < image.Width; x++)
-                    {
-                        Color c = bt.GetPixel(x, y);
-
-                        // int a = c.A;
-                        int r = c.R;
-                        int g = c.G;
-                        int b = c.B;
-
-                        int avg = (r + g + b) / 3;
-                        bt.SetPixel(x, y, Color.FromArgb(avg, avg, avg));
-                    }
-                pictureBox1.Image = bt;
-
-
-            }
-        }
 
         public Form1()
         {
             InitializeComponent();
+            simpleOpenGlControl1.InitializeContexts();
             weights_x = new sbyte[,] { { 1, 0, -1 }, { 2, 0, -2 }, { 1, 0, -1 } };
             weights_y = new sbyte[,] { { 1, 2, 1 }, { 0, 0, 0 }, { -1, -2, -1 } };
         }
@@ -178,14 +272,6 @@ namespace Lab1_kg_
             backgroundWorker1.RunWorkerAsync(filter);
         }
 
-        //sobel (black/white) filter
-        /*private void sobelToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Filter filter = new Sobel();
-            backgroundWorker1.RunWorkerAsync(filter);
-        }*/
-
-        //median filter (often used to remove noise from an image or signal)
         private void medianToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Filter filter = new Median();
@@ -200,8 +286,10 @@ namespace Lab1_kg_
         }
 
         //download stop 
-        private void button1_Click(object sender, EventArgs e) { backgroundWorker1.CancelAsync(); }
-
+        private void button1_Click(object sender, EventArgs e) 
+        { 
+            backgroundWorker1.CancelAsync(); 
+        }
         #region background
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -228,6 +316,7 @@ namespace Lab1_kg_
 
 
         #endregion
+
 
         //convert
         private void button2_Click(object sender, EventArgs e)
@@ -259,9 +348,9 @@ namespace Lab1_kg_
                 Marshal.Copy(pointer, buffer, 0, buffer.Length);
                 for (int i = 0; i < image.Height * 3 * image.Width; i += 3)
                 {
-                    b = (int)(255 * Math.Pow((buffer[i] / 255.0), gammacorrection));
-                    g = (int)(255 * Math.Pow((buffer[i + 1] / 255.0), gammacorrection));
-                    r = (int)(255 * Math.Pow((buffer[i + 2] / 255.0), gammacorrection));
+                    b = (int)(120 * Math.Pow((buffer[i] / 120.0), gammacorrection));
+                    g = (int)(120 * Math.Pow((buffer[i + 1] / 120.0), gammacorrection));
+                    r = (int)(120 * Math.Pow((buffer[i + 2] / 120.0), gammacorrection));
                     if (b > 255) b = 255;
                     if (g > 255) g = 255;
                     if (r > 255) r = 255;
@@ -272,31 +361,6 @@ namespace Lab1_kg_
                 Marshal.Copy(buffer, 0, pointer, buffer.Length);
                 buffer_image.UnlockBits(ImageData);
                 pictureBox1.Image = (Bitmap)buffer_image.Clone();
-            }
-        }
-
-
-        private void grayScaleToolStripMenuItem_Click(Bitmap sourceImage, object sender, EventArgs e)
-        {
-           
-            Bitmap bt = new Bitmap(pictureBox1.Image);
-            {
-                for (int y = 0; y < image.Height; y++)
-                    for (int x = 0; x < image.Width; x++)
-                    {
-                        Color c = bt.GetPixel(x, y);
-                      
-                        // int a = c.A;
-                        int r = c.R;
-                        int g = c.G;
-                        int b = c.B;
-
-                        int avg = (r + g + b) / 3;
-                        bt.SetPixel(x, y, Color.FromArgb(avg, avg, avg));
-                    }
-                pictureBox1.Image = bt;
-
-               
             }
         }
 
